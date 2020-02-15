@@ -3,24 +3,27 @@
 // Change to your netid
 package arc180006;
 
-import java.util.Comparator;
+// import java.util.Comparator;
 import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
+// import java.util.PriorityQueue;
 
 public class BinaryHeap<T extends Comparable<? super T>> {
     Comparable[] pq;
     int size;
-    int capacity;
 
     // Constructor for building an empty priority queue using natural ordering of T
     public BinaryHeap(int maxCapacity) {
         pq = new Comparable[maxCapacity];
-        capacity = maxCapacity;
         size = 0;
     }
 
     // add method: resize pq if needed
     public boolean add(T x) {
+        if (pq.length == size()) { // priority queue has reached max capacity
+            resize(); // double the size if possible
+        }
+
+        // add x to the end of the queue and percolate up
         pq[size] = x;
         percolateUp(size++);
         return true;
@@ -42,10 +45,11 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     // return null if pq is empty
     public T poll() {
-        if (size == 0)
+        if (isEmpty())
             return null;
         T min = ((T) pq[0]);
         pq[0] = pq[--size];
+        pq[size + 1] = null;
         percolateDown(0);
         return min;
     }
@@ -56,9 +60,7 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     // return null if pq is empty
     public T peek() {
-        if (size == 0)
-            return null;
-        return ((T) pq[0]);
+        return isEmpty() ? null : ((T) pq[0]);
     }
 
     int parent(int i) {
@@ -69,37 +71,62 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         return 2 * i + 1;
     }
 
+    int rightChild(int i) {
+        return 2 * i + 2;
+    }
+
     /** pq[index] may violate heap order with parent */
     void percolateUp(int index) {
-        T x = ((T) pq[index]);
-
-        while (index > 0 && (compare(pq[parent(index)], x) == 1)) {
-            pq[index] = pq[parent(index)];
-            index = parent(index);
-            pq[index] = x;
+        if (index == 0) {
+            return;
+        }
+        int parentIndex = parent(index);
+        if (compare(pq[index], pq[parentIndex]) < 0) { // if value at current index < parent, swap
+            swap(index, parentIndex);
+            percolateUp(parentIndex);
         }
 
     }
 
     /** pq[index] may violate heap order with children */
     void percolateDown(int index) {
-        T x = ((T) pq[index]);
-        int small = left(index);
-        while (small <= size - 1) {
-            if ((small < size - 1) && compare(pq[small], pq[small + 1]) == 1)
-                small = small + 1;
-            if (compare(x, pq[small]) == -1)
-                break;
-            pq[index] = pq[small];
-            index = small;
-            small = left(index);
-            pq[index] = x;
+
+        int leftChildIndex = leftChild(index) > size() - 1 ? -1 : leftChild(index);
+        int rightChildIndex = rightChild(index) > size() - 1 ? -1 : rightChild(index);
+
+        if (leftChildIndex == -1 && rightChildIndex == -1) {
+            return; // reach leaf
+        }
+
+        if (leftChildIndex != -1 && rightChildIndex != -1) {// has both children
+            int minIndex = min(index, leftChildIndex, rightChildIndex);
+            if (minIndex == index) {
+                return;
+            }
+            // swap value at index with value at min index
+            swap(index, minIndex);
+            percolateDown(minIndex);
+        } else if (leftChildIndex != -1 && rightChildIndex == -1) { // only have left child, not right child
+            if (compare(pq[leftChildIndex], pq[index]) < 0) { // if leftchild value smaller than current node value
+                swap(index, leftChildIndex);
+                percolateDown(leftChildIndex);
+            }
+        } else {
+            throw new Error("something is wrong");
         }
 
     }
 
-    private int left(int index) {
-        return 2 * index + 1;
+    void swap(int indexA, int indexB) {
+        Comparable temp = pq[indexA];
+        pq[indexA] = pq[indexB];
+        pq[indexB] = temp;
+    }
+
+    // get index of smallest node out of 3 nodes
+    int min(int aIndex, int bIndex, int cIndex) {
+        int min2Index = pq[aIndex].compareTo(pq[bIndex]) < 0 ? aIndex : bIndex;
+        return pq[cIndex].compareTo(pq[min2Index]) < 0 ? cIndex : min2Index;
     }
 
     /**
@@ -131,11 +158,15 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     // Resize array to double the current size
     void resize() {
-        Comparable[] tmp = (Comparable[]) new Object[2*capacity]; 
-        for(int i=0; i < capacity; i++)
-        { 
-            tmp[i] = pq[i]; 
-        } 
+        Integer maxHalfSize = Integer.MAX_VALUE / 2;
+        if (pq.length >= maxHalfSize) {
+            throw new OutOfMemoryError("Cannot double the current size");
+        }
+        if (pq.length == 0) {
+            throw new Error("Cannot add element to queue of size 0");
+        }
+        Comparable[] tmp = new Comparable[2 * pq.length];
+        System.arraycopy(pq, 0, tmp, 0, pq.length);
         pq = tmp;
     }
 
