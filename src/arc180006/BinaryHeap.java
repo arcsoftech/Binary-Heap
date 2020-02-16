@@ -1,13 +1,15 @@
-// Starter code for SP9
-
-// Change to your netid
+/**
+ * BinaryHeap class 
+ *
+ *  @author Arihant Chhajed, Cuong Ngo
+ *  Ver 1.0: 2020/02/16
+ */
 package arc180006;
 
-// import java.util.Comparator;
 import java.util.NoSuchElementException;
 // import java.util.PriorityQueue;
 
-public class BinaryHeap<T extends Comparable<? super T>> {
+public class BinaryHeap<T extends Comparable<? super T>>{
     Comparable[] pq;
     int size;
 
@@ -17,23 +19,35 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         size = 0;
     }
 
-    // add method: resize pq if needed
+    /**
+     * Add element into binary heap. resize pq if needed
+     * @param x- Element x
+     * @return - (True, False)
+     */
     public boolean add(T x) {
         if (pq.length == size()) { // priority queue has reached max capacity
             resize(); // double the size if possible
         }
-
         // add x to the end of the queue and percolate up
         pq[size] = x;
         percolateUp(size++);
         return true;
     }
 
+    /**
+     * Add element into binary heap. resize pq if needed
+     * @param x - Element of type x
+     * @return - (True, False)
+     */
     public boolean offer(T x) {
         return add(x);
     }
 
-    // throw exception if pq is empty
+    /**
+     * Remove minimum element from heap.
+     * @return Element of type T
+     * @throws NoSuchElementException
+     */
     public T remove() throws NoSuchElementException {
         T result = poll();
         if (result == null) {
@@ -43,39 +57,73 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         }
     }
 
-    // return null if pq is empty
+    /**
+     * Remove minimum element from heap and return null if heap is empty
+     * @return Element of type T
+     */
     public T poll() {
         if (isEmpty())
             return null;
+        @SuppressWarnings("unchecked")  
         T min = ((T) pq[0]);
         pq[0] = pq[--size];
-        pq[size + 1] = null;
+        pq[size] = null;
         percolateDown(0);
         return min;
     }
 
+    /**
+     * Return minimum element in heap
+     * @return Element of type T
+     * @throws NoSuchElementException
+     */
     public T min() {
-        return peek();
+        T result = peek();
+        if (result == null) 
+            throw new NoSuchElementException("Priority queue is empty");
+        return result;
     }
 
-    // return null if pq is empty
+    /**
+     * Return minimum element in heap
+     * @return Element of type T
+     */
+    @SuppressWarnings("unchecked")
     public T peek() {
         return isEmpty() ? null : ((T) pq[0]);
     }
 
+    /**
+     * compute index of parent of element at index i
+     * @param i - index of element i
+     * @return - index of parent element
+     */
     int parent(int i) {
         return (i - 1) / 2;
     }
 
+    /**
+     * compute index of left child of element at index i
+     * @param i - index of element i
+     * @return - index of left child element
+     */
     int leftChild(int i) {
         return 2 * i + 1;
     }
 
+    /**
+     * compute index of right child of element at index i
+     * @param i - index of element i
+     * @return - index of right child element
+     */
     int rightChild(int i) {
         return 2 * i + 2;
     }
 
-    /** pq[index] may violate heap order with parent */
+    /**
+     * percolate up till the violation is avoided with parent
+     * @param index - current position of element of type T
+     */
     void percolateUp(int index) {
         if (index == 0) {
             return;
@@ -88,7 +136,10 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     }
 
-    /** pq[index] may violate heap order with children */
+    /**
+     * percolate up till the violation is avoided with children
+     * @param index - current position of element of type T
+     */
     void percolateDown(int index) {
 
         int leftChildIndex = leftChild(index) > size() - 1 ? -1 : leftChild(index);
@@ -116,14 +167,26 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         }
 
     }
-
+ 
+    /**
+     * Swap element at position indexA and indexB
+     * @param indexA
+     * @param indexB
+     */
     void swap(int indexA, int indexB) {
         Comparable temp = pq[indexA];
         pq[indexA] = pq[indexB];
         pq[indexB] = temp;
     }
 
-    // get index of smallest node out of 3 nodes
+    /**
+     * get index of smallest node out of 3 nodes
+     * @param aIndex
+     * @param bIndex
+     * @param cIndex
+     * @return
+     */
+    @SuppressWarnings("unchecked")
     int min(int aIndex, int bIndex, int cIndex) {
         int min2Index = pq[aIndex].compareTo(pq[bIndex]) < 0 ? aIndex : bIndex;
         return pq[cIndex].compareTo(pq[min2Index]) < 0 ? cIndex : min2Index;
@@ -137,27 +200,38 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         pq[dest] = x;
     }
 
+    @SuppressWarnings("unchecked")
     int compare(Comparable a, Comparable b) {
         return ((T) a).compareTo((T) b);
     }
 
     /** Create a heap. Precondition: none. */
-    void buildHeap() {
+    public void buildHeap() {
         for (int i = parent(size - 1); i >= 0; i--) {
             percolateDown(i);
         }
     }
 
+    /**
+     * Check if heap is empty or not
+     * @return - (True,False)
+     */
     public boolean isEmpty() {
         return size() == 0;
     }
 
+    /**
+     * Return the fize of heap
+     * @return - int
+     */
     public int size() {
         return size;
     }
 
-    // Resize array to double the current size
-    void resize() {
+    /**
+     * Resize array to double the current size
+     */
+    private void resize() {
         Integer maxHalfSize = Integer.MAX_VALUE / 2;
         if (pq.length >= maxHalfSize) {
             throw new OutOfMemoryError("Cannot double the current size");
@@ -172,7 +246,6 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     public interface Index {
         public void putIndex(int index);
-
         public int getIndex();
     }
 
@@ -195,7 +268,7 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     public static void main(String[] args) {
         Integer[] arr = { 0, 9, 7, 5, 3, 1, 8, 6, 4, 2 };
-        BinaryHeap<Integer> h = new BinaryHeap(arr.length);
+        BinaryHeap<Integer> h = new BinaryHeap<>(arr.length);
 
         System.out.print("Before:");
         for (Integer x : arr) {

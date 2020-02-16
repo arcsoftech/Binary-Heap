@@ -13,7 +13,9 @@ This is the short project in IDSA class that aims to implement BinaryHeap.
 
 2. Run the following command:-
 
-    Compile : `javac -d bin arc180006/*.java`  <br />
+    Compile : `javac -d bin arc180006/*.java` 
     ChangeDirectory: `cd bin`
-    Run: ` java arc180006.BinaryHeap` <br />
+    Run: ` java arc180006.BinaryHeap`
+
+
 
