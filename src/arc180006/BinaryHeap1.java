@@ -7,12 +7,12 @@ import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 
-public class BinaryHeap<T extends Comparable<? super T>> {
+public class BinaryHeap1<T extends Comparable<? super T>> {
 	Comparable[] pq;
 	int size;
 
 	// Constructor for building an empty priority queue using natural ordering of T
-	public BinaryHeap(int maxCapacity) {
+	public BinaryHeap1(int maxCapacity) {
 		pq = new Comparable[maxCapacity];
 		size = 0;
 	}
